@@ -3,15 +3,12 @@ using namespace std;
 
 class radioMP3 {
     private:
-        int frequenza;
+        float frequenza;
         int volume;
     public:
-        radioMP3(int frequenza, int volume)
-        {
-            this->frequenza = frequenza;
-            this->volume = volume;
-        }
+        radioMP3(float frequenza, int volume);
         void iniziare();
+        ~radioMP3(){cout << "Chiamato distruttore radioMP3" << endl;}
         void AumentareFrequenza();
         void DiminuireFrequenza();
         void AbbassareVolume();
@@ -19,6 +16,8 @@ class radioMP3 {
         void StampaFrequenza();
         void StampaVolume();
 };
+
+radioMP3::radioMP3(float frequenza, int volume):frequenza(frequenza),volume(volume){};
 
 void radioMP3::iniziare()
 {
@@ -64,9 +63,10 @@ void radioMP3::StampaVolume()
 }
 
 int main(){
-    radioMP3 miaStazione(99.9, 45);
+    
+    radioMP3 miaStazione(99.99, 45);
 
-    //miaStazione.iniziare();
+    miaStazione.iniziare();
     miaStazione.AlzareVolume();
     miaStazione.AbbassareVolume();
     miaStazione.AumentareFrequenza();
