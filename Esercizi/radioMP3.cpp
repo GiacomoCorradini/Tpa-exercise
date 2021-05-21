@@ -6,6 +6,11 @@ class radioMP3 {
         int frequenza;
         int volume;
     public:
+        radioMP3(int frequenza, int volume)
+        {
+            this->frequenza = frequenza;
+            this->volume = volume;
+        }
         void iniziare();
         void AumentareFrequenza();
         void DiminuireFrequenza();
@@ -59,9 +64,9 @@ void radioMP3::StampaVolume()
 }
 
 int main(){
-    radioMP3 miaStazione;
+    radioMP3 miaStazione(99.9, 45);
 
-    miaStazione.iniziare();
+    //miaStazione.iniziare();
     miaStazione.AlzareVolume();
     miaStazione.AbbassareVolume();
     miaStazione.AumentareFrequenza();
