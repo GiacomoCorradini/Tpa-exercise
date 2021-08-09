@@ -20,10 +20,11 @@ namespace my {
     class CircularQueue {
         
         private:
-            int capacity;
-            int head;
-            int size;
-            char* arr;
+            // fields
+            int capacity; 
+            int head; // head is an index pointing to the next element to be dequeued
+            int size; // size is the current dimension of the queue
+            char* arr; // arr is an index where new elements are enqueued
             
         public:
 
@@ -86,7 +87,5 @@ namespace my {
     };
     
 };
-
-
 
 #endif // MY_CIRCULAR_QUEUE_H
