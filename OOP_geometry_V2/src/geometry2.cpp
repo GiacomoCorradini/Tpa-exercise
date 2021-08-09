@@ -63,6 +63,7 @@ void PointArray::resize(int n){
     } else if (n == 0){
         delete[] this->point;
         this->point = NULL;
+        this->size = n;
     } else if(n < this->size || n > this->size){
         Point* old_point = this->point;
         this->point = new Point[n];

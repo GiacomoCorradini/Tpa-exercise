@@ -33,3 +33,46 @@ TEST_CASE("La funzione as_string ritorna il punto p nel formato stringa", "[geom
 
 //CLASS POINTARRAY
 
+TEST_CASE("La funzione push back aggiunge il punto p in cima all'array", "[geometry_V2]") {
+    const Point p1 (11 , 3);
+    const Point p2(12 , 7);
+    PointArray pa;
+    pa.push_back(p1);
+    pa.push_back(p2);
+    std::string s = pa.as_string();
+    REQUIRE(s == "size: 2 points: 11,3 12,7");
+}
+
+TEST_CASE("La funzione insert aggiunge il punto p nella posizione indicata nell'array", "[geometry_V2]") {
+    const Point p1 (11 , 3);
+    const Point p2(12 , 7);
+    PointArray pa;
+    pa.push_back(p1);
+    pa.push_back(p2);
+    pa.insert(1, Point(15, 5));
+    std::string s = pa.as_string();
+    REQUIRE(s == "size: 3 points: 11,3 15,5 12,7");
+}
+
+TEST_CASE("La funzione clear elimina i punti nell'array", "[geometry_V2]") {
+    const Point p1 (11 , 3);
+    const Point p2(12 , 7);
+    PointArray pa;
+    pa.push_back(p1);
+    pa.push_back(p2);
+    pa.insert(1, Point(15, 5));
+    pa.clear();
+    REQUIRE(pa.get_size() == 0);
+}
+
+TEST_CASE("La funzione remove elimina il punto nella posizione indicata nell'array", "[geometry_V2]") {
+    const Point p1 (11 , 3);
+    const Point p2(12 , 7);
+    PointArray pa;
+    pa.push_back(p1);
+    pa.push_back(p2);
+    pa.insert(1, Point(15, 5));
+    pa.remove(1);
+    std::string s = pa.as_string();
+    REQUIRE(s == "size: 2 points: 11,3 12,7");
+}
