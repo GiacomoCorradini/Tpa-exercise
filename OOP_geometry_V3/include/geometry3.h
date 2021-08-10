@@ -64,7 +64,7 @@ class Polygon{
         Polygon(const Polygon& pol);
         ~Polygon();
 
-        virtual double area() const;
+        virtual double area() const = 0;
         static int getNumPolygons();
         int getNumSides() const;
         const PointArray* getPoints() const;
