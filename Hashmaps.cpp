@@ -5,7 +5,7 @@
 using std::cout;
 using std::endl;
 
-void unordered_map_example(){
+int main(){
 
     cout << endl;
     cout << "----- UNORDERED MAP" << endl;
@@ -170,7 +170,7 @@ void unordered_map_example(){
     // WARNING: .insert METHOD ONLY INSERTS IF KEY DOES NOT ALREADY EXIST!!
     // PLEASE PREFER USING [] OPERATOR INSTEAD
 
-    unordered_map<std::string , int > mymap;
+    std::unordered_map<std::string , int > mymap;
 
     mymap.insert(std::pair<std::string, int>("a",3));
     mymap.insert(std::pair<std::string, int>("a",4));
