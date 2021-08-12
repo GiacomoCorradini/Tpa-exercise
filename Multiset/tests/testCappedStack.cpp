@@ -1,6 +1,6 @@
 
 #include "catch2/catch2.hpp"
-#include "library.h"
+#include "CappedStack.h"
 
 
 TEST_CASE("init should succeed with non-zero denominator", "[fraction]") {
