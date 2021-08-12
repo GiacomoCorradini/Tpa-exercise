@@ -3,9 +3,13 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
+#include <algorithm>
 
 using std::string;
+using std::vector;
 
+template<typename T>
 class Stack {
  
    public:
@@ -29,20 +33,20 @@ class Stack {
        /** Adds item to the top of the stack, if current size is within cap.
                             
        */
-       virtual void push(const char c) = 0;
+       virtual void push(const T c) = 0;
  
        /** RETURN the top element in the stack (without removing it!)
               
                - if stack is empty, throw std::runtime_error
  
        */
-       virtual char peek() const = 0;
+       virtual T peek() const = 0;
  
        /** Removes the top element in the stack and RETURN it.
  
                - if stack is empty, throw std::runtime_error
        */
-       virtual char pop() = 0;
+       virtual T pop() = 0;
  
        /**
            RETURN a string with the n top elements, in the order in which they
@@ -59,7 +63,7 @@ class Stack {
            - If there aren't enough element to peek, throw std::invalid_argument
            - If n is negative, throw std::invalid_argument
        */
-       virtual string peekn(const int n) const = 0;
+       virtual vector<T> peekn(const int n) const = 0;
  
        /**
            Pops the top n elements, and RETURN them as a string, in the order in
@@ -81,7 +85,7 @@ class Stack {
            - If there aren't enough element to pop, throw std::invalid_argument
            - If n is negative, throw std::invalid_argument
        */
-       virtual string popn(const int n) = 0;
+       virtual vector<T> popn(const int n) = 0;
  
 };
 
