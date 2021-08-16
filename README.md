@@ -8,10 +8,10 @@ In questo repositories sono presenti i programmi di esercitazione del corso di t
 ## OOP_geometry_V3
 
 ## Stack_V1
-### Vector
 ## Stack_V2
 
 ## Multiset
-### Hashmaps
 
 ## Matrix
+
+## Italian Queue
