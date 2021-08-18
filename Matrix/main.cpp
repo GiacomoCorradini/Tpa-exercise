@@ -166,6 +166,6 @@ void sparse_matrix_example(){
 int main(){
 
     // conversions_example();
-    dense_matrix_example();
-    // sparse_matrix_example();
+    // dense_matrix_example();
+    sparse_matrix_example();
 }
