@@ -84,7 +84,7 @@ class Company{
 
     private:
 
-        deque<Impiegato*> impiegati_;
+        vector<Impiegato*> impiegati_;
 
     public:
 
@@ -101,7 +101,7 @@ class Company{
         }
 
         void add_employee(char c, int i){
-            for(Impiegato* im : impiegati_){
+            for(Impiegato* im : this->impiegati_){
                 if(c == im->get_name()){
                     throw std::runtime_error(string("Employ named: ") + im->get_name() + string(" already exist"));
                 }
@@ -110,7 +110,14 @@ class Company{
                 }
             }
             Impiegato* ret = new Impiegato(c, i);
-            
+            int j = 0;
+            int min = this->impiegati_[0]->get_rank();            
+            for(Impiegato* im : this->impiegati_){
+                if(min < im->get_rank()){
+                    min = im->get_rank();
+                }
+                j++;
+            }
             this->impiegati_.push_back(ret);
         }
 
@@ -148,7 +155,7 @@ class Company{
                     i = 1;
                 }
             }
-            if(i == 1){
+            if(i == 0){
                 throw std::invalid_argument("Employee doesn't exist");
             }
         }
