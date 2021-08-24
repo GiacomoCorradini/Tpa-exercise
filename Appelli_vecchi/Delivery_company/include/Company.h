@@ -3,9 +3,9 @@
 
 #include <deliv.h>
 
-#define MIN_DELAY = 10
-#define RIPOSO = 8*60
-
+#define MIN_DELAY 10
+#define RIPOSO 8*60
+/*
 // classe beni
 class Beni {
 
@@ -34,7 +34,7 @@ class Beni {
             return this->numero_;
         }
 };
-
+*/
 class Warehouse {
 
     private:
@@ -115,11 +115,27 @@ struct Customs {
         }
 };
 
-struct Viaggio{
-    int id_;
-    unordered_map<string, Beni*> carico_;
-    vector<int> permanenza_a, permanenza_e;
-    vector<int> min_cumu_a, min_cumu_e;
+class Viaggio{
+
+    private:
+
+        int id_;
+        unordered_map<string, Beni*> carico_;
+        vector<int> permanenza_a, permanenza_e;
+        vector<int> min_cumu_a, min_cumu_e;
+
+    public:
+
+        Viaggio(int id) : id_(id) {
+            cout << "Costruttore viaggio: " << this->id_ << endl;
+        }
+
+        ~Viaggio(){
+            cout << "Distruttore viaggio" << endl;
+            for(std::pair<const string, Beni*>& b : this->carico_){
+                delete b.second;
+            }
+        }
 };
 
 class Company{
@@ -129,24 +145,26 @@ class Company{
         vector<Viaggio*> trip_;
         unordered_map<string, Warehouse*> warehouse_; // database magazzini: nome città, Warehouse
         unordered_map<string, Customs*> customs_; // database dogane: nome, Customs
-        int trip_id_; // id del viaggio
         unordered_map<string, Connection*> connection_; // database connection: nome città_partenza, connection
 
     public:
 
         // costruttore company
         Company(){
-            this->trip_id_ = -1;
             cout << "DEBUG: Constructor company" << endl;
         }
 
         // distruttore company
         ~Company(){
+            cout << "DEBUG: Distruttore company" << endl;
             for(std::pair<const string, Warehouse*> w : this->warehouse_){
                 delete w.second;
             }
             for(std::pair<const string, Customs*> a : this->customs_){
                 delete a.second;
+            }
+            for(Viaggio* v : this->trip_){
+                delete v;
             }
         }
 
@@ -180,17 +198,43 @@ class Company{
         }
 
         void load(int trip_id, string citta, const unordered_map<string, int>& carico){
+            // check magazzino
+            if(this->warehouse_.count(citta) != 1){
+                throw std::invalid_argument(string("Magazzino non presente a: ") + citta);
+            }
+            // check carico in magazzino
+            for(std::pair<const string, int> c : carico){
+                if(this->warehouse_.at(citta)->get_beni().count(c.first) != 1){
+                    throw std::invalid_argument(string("Carico in magazzino non presente: ") + c.first);
+                }
+            }
+            // stampa
             cout << "DEBUG goods to load: {" << endl;
             for(std::pair<string, int> d : carico){
                 cout << "\t" << d.first << " : " << d.second;
             }
-            
-            
+            // registrazione carico
+            for(std::pair<const string, int> c : carico){
+                Beni* ben = new Beni(c.first, c.second);
+                this->trip_[trip_id]->carico_[c.first] = ben;
+            }
+            // aggiotnamento tempistica
+            int min = 0;
+            for(std::pair<const string, int> c : carico){
+                min += MIN_DELAY * c.second;
+            }
+            this->trip_[trip_id]->permanenza_a.push_back(min);
+            int min_a = min + this->trip_[trip_id]->min_cumu_a[trip_id];
+            this->trip_[trip_id]->min_cumu_a.push_back(min_a);
+            // aggiornamento magazzino
+            for(std::pair<const string, int> c : carico){
+                
+            }
         }
 /*
         string trip_to_string(int id){
-
+            stringstream ss;
+            
         }
-        */
+*/
 };
-

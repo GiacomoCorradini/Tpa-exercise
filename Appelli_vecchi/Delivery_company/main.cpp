@@ -24,7 +24,7 @@ int main() {
     cout << "PLANNING..." << endl;
     company.load(trip_id, "Trento", {{"mele",10}, {"fragole",7}});  // carica 10 casse di mele e 7 di fragole dal magazzino
     /*
-    company.check_in(trip_id, "Milano");      // ferma alla dogana    
+    company.check_in(trip_id, "Milano");      // ferma alla dogana
     company.check_in(trip_id, "Dusseldorf");
     /*
     company.rest(trip_id, "Parigi");         // riposo previsto 8h
