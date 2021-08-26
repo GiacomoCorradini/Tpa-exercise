@@ -2,6 +2,7 @@
 #define COMPANY_H
 
 #include <iostream>
+#include <iomanip>
 #include <unordered_map>
 #include <string>
 #include <deque>
@@ -12,7 +13,7 @@
 #define MIN_DELAY 10
 #define RIPOSO 8*60
 
-using std::deque;
+using std::setw;
 
 class Warehouse {
 
@@ -28,11 +29,6 @@ class Warehouse {
             this->nome_citta_ = nome;
             for(std::pair<const string, int> b : beni){
                 this->beni_W_[b.first] = b.second;
-            }
-            cout << "Magazzino: " << this->nome_citta_ << endl;
-            cout << "Beni presenti nel magazzino: " << endl;
-            for(std::pair<const string, int> b : this->beni_W_){
-                cout << "\t" << b.first << " " << b.second << endl;
             }
         }
 
@@ -72,11 +68,6 @@ class Customs {
             for(std::pair<const string, int> c : beni){
                 this->beni_C_[c.first] = c.second;
             }
-            cout << "Dogana: " << this->nome_citta_ << endl;
-            cout << "Minuti necessari per check beni alla dogana: " << endl;
-            for(std::pair<const string, int> b : this->beni_C_){
-                cout << "\t" << b.first << " " << b.second << endl;
-            }
         }
 
         // Distruttore warehouse
@@ -113,23 +104,15 @@ class Viaggio{
     public:
 
         // costruttore viaggio
-        Viaggio(int id) : id_(id) {
-            cout << "DEBUG: costruttore viaggio" << endl;
-        }
+        Viaggio(int id) : id_(id) {}
 
         // Distruttore viaggio
-        ~Viaggio(){
-            cout << "DEBUG: distruttore viaggio" << endl;
-        }
+        ~Viaggio(){}
 
         // funzione che registra carico
         void set_carico(unordered_map<string, int> carico){
             for(std::pair<const string, int> b : carico){
                 this->carico_[b.first] = b.second;
-            }
-            cout << "Carico presente nel camion:" << endl;
-            for(std::pair<const string, int> b : this->carico_){
-                cout << b.first << " " << b.second << endl;
             }
         }
 
@@ -153,14 +136,24 @@ class Viaggio{
             return this->id_;
         }
 
-        // funzione che ritorna vettore di tempi di permanenza
+        // funzione che ritorna vettore di tempi di permanenza attesi
         const vector<int>& get_permanenza() const {
             return this->permanenza_a_;
         }
 
-        // funzione che ritorna vettore di tempi cumulativi
+        // funzione che ritorna vettore di tempi cumulativi attesi
         const vector<int>& get_cumulativi() const {
             return this->min_cumu_a_;
+        }
+
+        // funzione che ritorna vettore di tempi di permanenza effettivi
+        const vector<int>& get_permanenza_e() const {
+            return this->permanenza_e_;
+        }
+
+        // funzione che ritorna vettore di tempi cumulativi effettivi
+        const vector<int>& get_cumulativi_e() const {
+            return this->min_cumu_e_;
         }
 
         // funzione che ritorna il carico 
@@ -210,6 +203,11 @@ class Company{
             Warehouse* war = new Warehouse(citta, ware);
             this->warehouse_[citta] = war;
             cout << "DEBUG: Adding warehouse " << this->warehouse_[citta]->get_citta() << endl;
+            cout << "DEBUG: Beni presenti nel magazzino di: " << this->warehouse_[citta]->get_citta() << " {" << endl;
+            for(std::pair<const string, int> b : this->warehouse_.at(citta)->get_beni()){
+                cout << "\t" << b.first << " " << b.second << endl;
+            }
+            cout << "}" << endl;
         }
 
         // funzione cha aggiunge customs
@@ -217,6 +215,11 @@ class Company{
             Customs* war = new Customs(citta, ware);
             this->customs_[citta] = war;
             cout << "DEBUG: Adding customs " << this->customs_[citta]->get_citta() << endl;
+            cout << "DEBUG: Minuti necessari per check beni alla dogana " << this->customs_[citta]->get_citta() << " {" << endl;
+            for(std::pair<const string, int> b : this->customs_.at(citta)->get_beni()){
+                cout << "\t" << b.first << " " << b.second << endl;
+            }
+            cout << "}" << endl;
         }
 
         // funzione che aggiunge connection
@@ -234,7 +237,7 @@ class Company{
             return via->get_id();
         }
 
-        void load(int trip_id, string citta, const unordered_map<string, int>& carico){
+        void load(int trip_id, string citta, const unordered_map<string, int>& carico, int minuti = -1){
             
             int min = 0;
             int min_a = 0;
@@ -286,13 +289,20 @@ class Company{
                     this->warehouse_[citta]->get_beni()[c.first] -= c.second;
                 }
             }
-            cout << "DEBUG: Dopo carico, beni presenti in magazzino:" << endl;
+            cout << "DEBUG: Dopo carico, beni presenti in magazzino " << citta << " {" << endl;
             for(std::pair<const string, int> g : this->warehouse_[citta]->get_beni()){
-                cout << g.first << " " << g.second << endl;
+                cout << "\t" << g.first << " " << g.second << endl;
             }
+            cout << "}" << endl;
+
+            cout << "DEBUG: goods on truck are now:{" << endl;
+            for(std::pair<const string, int> m : this->trip_.at(trip_id)->get_beni()){
+                cout << "\t" << m.first << " " << m.second << endl;
+            }
+            cout << "}" << endl;
         }
 
-        void check_in(int id, string nome){
+        void check_in(int id, string nome, int minuti = -1){
             
             cout << "DEBUG: plan check_in for trip " << id << " at location " << nome << endl;
 
@@ -330,7 +340,7 @@ class Company{
 
         }
 
-        void rest(int id, string nome){
+        void rest(int id, string nome, int minuti = -1){
             
             cout << "DEBUG: plan rest for trip " << id << " at location " << nome;
 
@@ -354,8 +364,16 @@ class Company{
             cout << " tempo di permanenza: " << min << endl;
         }
 
-        void ship(const int trip_id, const string citta, const unordered_map<string, int>& carico){
+        void ship(const int trip_id, const string citta, const unordered_map<string, int>& carico, int minuti = -1){
+            int min = 0;
+            int min_a = 0;
 
+            cout << "DEBUG: goods to ship: {" << endl;
+            for(std::pair<const string, int> k : carico){
+                cout << "\t" << k.first << " " << k.second << endl;
+            }
+            cout << "}" << endl;
+            
             // aggiorna mappa
             this->trip_[trip_id]->set_mappa(citta);
 
@@ -368,58 +386,67 @@ class Company{
 
             // aggiornamento magazzino
             for(std::pair<const string, int> c : carico){
-                if(this->warehouse_[citta]->get_beni().count(c.first) == 1){
+                if(this->warehouse_.at(citta)->get_beni().count(c.first) == 1){
                     this->warehouse_[citta]->get_beni()[c.first] += c.second;
                 }
             }
+            cout << "DEBUG: Dopo scarico, beni presenti in magazzino " << citta << " {" << endl;
             for(std::pair<const string, int> g : this->warehouse_[citta]->get_beni()){
-                cout << g.first << " " << g.second << endl;
+                cout << "\t" << g.first << " " << g.second << endl;
             }
+            cout << "}" << endl;
 
             // aggiornamento carico sul camion
             for(std::pair<const string, int> c : carico){
-                if(this->trip_.at(trip_id)->get_beni().count(c.first) != 1){
+                if(this->trip_.at(trip_id)->get_beni().count(c.first) == 1){
                     this->trip_[trip_id]->get_beni()[c.first] -= c.second;
                 }
             }
-            for(std::pair<const string, int> c : this->trip_.at(trip_id)->get_beni()){
-                cout << "DEBUG: Dopo scarico, beni presenti in magazzino:" << endl;
-                cout << c.first << " " << c.second << endl;
+            cout << "DEBUG: goods on truck are now:{" << endl;
+            for(std::pair<const string, int> m : this->trip_.at(trip_id)->get_beni()){
+                cout << "\t" << m.first << " " << m.second << endl;
+            }
+            cout << "}" << endl;
+
+            // calcolo tempo di permanenza
+            for(std::pair<const string, int> c : carico){
+                min += MIN_DELAY * c.second;
             }
 
-            // aggiornamento magazzino
-            for(std::pair<const string, int> c : carico){
-                if(this->warehouse_[citta]->get_beni().count(c.first) == 1){
-                    this->warehouse_[citta]->get_beni()[c.first] -= c.second;
-                }
+            // aggiorna tempo di permanenza
+            this->trip_[trip_id]->set_permanenza(min);
+
+            // calcolo tempo cumulativo
+            for(int v : this->trip_[trip_id]->get_permanenza()){
+                min_a += v;
             }
-            for(std::pair<const string, int> g : this->warehouse_[citta]->get_beni()){
-                cout << g.first << " " << g.second << endl;
-            }
+
+            // aggiorna tempo cumulativo
+            this->trip_[trip_id]->set_cumulativi(min_a);
         }
-///
+
         string trip_to_string(int id){
             stringstream ss;
-            ss << "Stop:\t\t";
+            ss << "Stop:" << setw(11);
             for(string s : this->trip_[id]->get_mappa()){
-                ss << s << "\t\t";
+                ss << s << setw(11);
             }
             ss << endl;
             ss << "permanenza" << endl;
-            ss << "attesa:\t\t";
+            ss << "attesa:" << setw(11);
             for(int i : this->trip_[id]->get_permanenza()){
-                ss << i << "\t\t";
+                ss << i << setw(11);
             }
             ss << endl;
-            ss << "effettiva:\t\t";
+            ss << "effettiva:" << setw(11);
             ss << endl;
             ss << "min cumulativi" << endl;
-            ss << "attesi:\t\t";
+            ss << "attesi:" << setw(11);
+            for(int j : this->trip_[id]->get_cumulativi()){
+                ss << j << setw(11);
+            }
             ss << endl;
             ss << "effettivi:\t\t";
-            for(int j : this->trip_[id]->get_cumulativi()){
-                ss << j << "\t\t";
-            }
             return ss.str();
         }
 
