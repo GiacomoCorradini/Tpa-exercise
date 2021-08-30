@@ -131,6 +131,16 @@ class Viaggio{
             this->min_cumu_a_.push_back(min);
         }
 
+        // funzione che registra permanenza effettivi 
+        void set_permanenza_e(int min){
+            this->permanenza_e_.push_back(min);
+        }
+
+        // funzione che registra minuti cumulativi effettivi
+        void set_cumulativi_e(int min){
+            this->min_cumu_e_.push_back(min);
+        }
+
         // funzione che ritorna id
         const int& get_id() const {
             return this->id_;
@@ -267,21 +277,29 @@ class Company{
             // aggiorna carico
             this->trip_[trip_id]->set_carico(carico);
 
-            // calcolo tempo di permanenza
-            for(std::pair<const string, int> c : carico){
-                min += MIN_DELAY * c.second;
+            if(minuti == -1){
+                // calcolo tempo di permanenza
+                for(std::pair<const string, int> c : carico){
+                    min += MIN_DELAY * c.second;
+                }
+
+                // aggiorna tempo di permanenza
+                this->trip_[trip_id]->set_permanenza(min);
+
+                // calcolo tempo cumulativo
+                for(int v : this->trip_[trip_id]->get_permanenza()){
+                    min_a += v;
+                }
+
+                // aggiorna tempo cumulativo
+                this->trip_[trip_id]->set_cumulativi(min_a);
+            } else {
+                this->trip_[trip_id]->set_permanenza_e(minuti);
+                for(int q : this->trip_[trip_id]->get_permanenza_e()){
+                    min_a += q;
+                }
+                this->trip_[trip_id]->set_cumulativi_e(min_a);
             }
-
-            // aggiorna tempo di permanenza
-            this->trip_[trip_id]->set_permanenza(min);
-
-            // calcolo tempo cumulativo
-            for(int v : this->trip_[trip_id]->get_permanenza()){
-                min_a += v;
-            }
-
-            // aggiorna tempo cumulativo
-            this->trip_[trip_id]->set_cumulativi(min_a);
 
             // aggiornamento magazzino
             for(std::pair<const string, int> c : carico){
@@ -312,31 +330,39 @@ class Company{
             // aggiorna mappa
             this->trip_[id]->set_mappa(nome);
 
-            // calcolo tempo di permanenza
-            if(this->customs_.count(nome) == 1){
-                for(std::pair<const string, int> c : this->trip_[id]->get_beni()){
-                    
-                        if(this->customs_.at(nome)->get_beni().count(c.first) == 1){
-                            min += (c.second * this->customs_.at(nome)->get_beni().at(c.first));
-                        } else {
-                            min += (c.second * MIN_DELAY);
-                        }
-                    
+            if(minuti == -1){
+                // calcolo tempo di permanenza
+                if(this->customs_.count(nome) == 1){
+                    for(std::pair<const string, int> c : this->trip_[id]->get_beni()){
+                        
+                            if(this->customs_.at(nome)->get_beni().count(c.first) == 1){
+                                min += (c.second * this->customs_.at(nome)->get_beni().at(c.first));
+                            } else {
+                                min += (c.second * MIN_DELAY);
+                            }
+                        
+                    }
+                } else {
+                    throw std::invalid_argument("Dogana non registrata");
                 }
+
+                // aggiorna tempo di permanenza
+                this->trip_[id]->set_permanenza(min);
+
+                // calcolo tempo cumulativo
+                for(int v : this->trip_[id]->get_permanenza()){
+                    min_a += v;
+                }
+
+                // aggiorna tempo cumulativo
+                this->trip_[id]->set_cumulativi(min_a);
             } else {
-                throw std::invalid_argument("Dogana non registrata");
+                this->trip_[id]->set_permanenza_e(minuti);
+                for(int w : this->trip_[id]->get_permanenza_e()){
+                    min_a += w;
+                }
+                this->trip_[id]->set_cumulativi_e(min_a);
             }
-
-            // aggiorna tempo di permanenza
-            this->trip_[id]->set_permanenza(min);
-
-            // calcolo tempo cumulativo
-            for(int v : this->trip_[id]->get_permanenza()){
-                min_a += v;
-            }
-
-            // aggiorna tempo cumulativo
-            this->trip_[id]->set_cumulativi(min_a);
 
         }
 
@@ -350,16 +376,24 @@ class Company{
             int min = RIPOSO;
             int min_a = 0;
 
-            // aggiorna tempo di permanenza
-            this->trip_[id]->set_permanenza(min);
+            if(minuti == -1){
+                // aggiorna tempo di permanenza
+                this->trip_[id]->set_permanenza(min);
 
-            // calcolo tempo cumulativo
-            for(int v : this->trip_[id]->get_permanenza()){
-                min_a += v;
+                // calcolo tempo cumulativo
+                for(int v : this->trip_[id]->get_permanenza()){
+                    min_a += v;
+                }
+
+                // aggiorna tempo cumulativo
+                this->trip_[id]->set_cumulativi(min_a);
+            } else {
+                this->trip_[id]->set_permanenza_e(minuti);
+                for(int q : this->trip_[id]->get_permanenza_e()){
+                    min_a += q;
+                }
+                this->trip_[id]->set_cumulativi_e(min_a);
             }
-
-            // aggiorna tempo cumulativo
-            this->trip_[id]->set_cumulativi(min_a);
 
             cout << " tempo di permanenza: " << min << endl;
         }
@@ -408,38 +442,56 @@ class Company{
             }
             cout << "}" << endl;
 
-            // calcolo tempo di permanenza
-            for(std::pair<const string, int> c : carico){
-                min += MIN_DELAY * c.second;
+            if(minuti == -1){
+                // calcolo tempo di permanenza
+                for(std::pair<const string, int> c : carico){
+                    min += MIN_DELAY * c.second;
+                }
+
+                // aggiorna tempo di permanenza
+                this->trip_[trip_id]->set_permanenza(min);
+
+                // calcolo tempo cumulativo
+                for(int v : this->trip_[trip_id]->get_permanenza()){
+                    min_a += v;
+                }
+
+                // aggiorna tempo cumulativo
+                this->trip_[trip_id]->set_cumulativi(min_a);
+            } else {
+                this->trip_[trip_id]->set_permanenza_e(minuti);
+                for(int q : this->trip_[trip_id]->get_permanenza_e()){
+                    min_a += q;
+                }
+                this->trip_[trip_id]->set_cumulativi_e(min_a);
             }
-
-            // aggiorna tempo di permanenza
-            this->trip_[trip_id]->set_permanenza(min);
-
-            // calcolo tempo cumulativo
-            for(int v : this->trip_[trip_id]->get_permanenza()){
-                min_a += v;
-            }
-
-            // aggiorna tempo cumulativo
-            this->trip_[trip_id]->set_cumulativi(min_a);
         }
 
         string trip_to_string(int id){
             stringstream ss;
+            // CITTA
             ss << "Stop:" << setw(11);
             for(string s : this->trip_[id]->get_mappa()){
                 ss << s << setw(11);
             }
             ss << endl;
+            
+            // PERMANENZA
             ss << "permanenza" << endl;
+
             ss << "attesa:" << setw(11);
             for(int i : this->trip_[id]->get_permanenza()){
                 ss << i << setw(11);
             }
             ss << endl;
+
             ss << "effettiva:" << setw(11);
+            for(int k : this->trip_[id]->get_permanenza_e()){
+                ss << k << setw(11);
+            }
             ss << endl;
+
+            // MINUTI CUMULATIVI
             ss << "min cumulativi" << endl;
             ss << "attesi:" << setw(11);
             for(int j : this->trip_[id]->get_cumulativi()){
@@ -447,6 +499,10 @@ class Company{
             }
             ss << endl;
             ss << "effettivi:\t\t";
+            for(int r : this->trip_[id]->get_cumulativi_e()){
+                ss << r << setw(11);
+            }
+            ss << endl;
             return ss.str();
         }
 
