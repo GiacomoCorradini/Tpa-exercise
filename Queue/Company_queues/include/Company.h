@@ -19,29 +19,25 @@ class Task{
 
     private:
 
-        unordered_map<char, int> tasks_;
+        char uno_;
+        int due_;
 
     public:
 
-        Task(const char c, const int i){
-            this->tasks_[c] = i;
-        }
-
-        Task(const unordered_map<char, int>& task) : tasks_(task) {
+        Task(const char& c, const int& i) : uno_(c), due_(i) {
             cout << "DEBUG: Constructor, add task" << endl;
         }
 
         ~Task() {
-            cout << "DEBUG: delete task" << endl;
+            cout << "DEBUG: Destructor, delete task" << endl;
         }
 
-        void set_task(const unordered_map<char, int>& task){
-            cout << "DEBUG: set task name" << endl;
-            this->tasks_ = task;
+        const char& first() const {
+            return this->uno_;
         }
 
-        const unordered_map<char, int>& get_task() const {
-            return this->tasks_;
+        const int& second() const {
+            return this->due_;
         }
 };
 
@@ -55,7 +51,7 @@ class Impiegato{
 
     public:
 
-        Impiegato(const char& name, const int& rank, const deque<Task*> tasks = {}) : name_(name), rank_(rank), tasks_(tasks) {
+        Impiegato(const char& name, const int& rank, deque<Task*> tasks = {}) : name_(name), rank_(rank), tasks_(tasks) {
             cout << "DEBUG: Constructor, add impiegato" << endl;
         }
 
@@ -110,28 +106,19 @@ class Company{
                 }
             }
             Impiegato* ret = new Impiegato(c, i);
-            int j = 0;
-            int min = this->impiegati_[0]->get_rank();            
-            for(Impiegato* im : this->impiegati_){
-                if(min < im->get_rank()){
-                    min = im->get_rank();
-                }
-                j++;
-            }
+            
             this->impiegati_.push_back(ret);
         }
 
-        string printmap(const deque<Task*>& map) const {
+        string printmap(const deque<Task*> map) const {
             stringstream os;
             int i = 0;
             for(Task* n : map){
-                for(std::pair<const char, int> m : n->get_task()){
-                    if(i > 0){
-                        os << ", ";
-                    }
-                    os << "('" << m.first << "' , " << m.second << ")";
-                    i++;
+                if(i > 0){
+                    os << ", ";
                 }
+                os << "('" << n->first() << "' , " << n->second() << ")";
+                i++;
             }
             return os.str();
         }

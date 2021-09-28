@@ -194,14 +194,15 @@ class Center{
         }
 
         Appointment book(string cf, Date data, Time time, string vax){
-            cout << " booking " << cf << " at " << data << " " << time << " for vaccine " << vax << endl;
+            cout << "Booking " << cf << " at " << data << " " << time << " for vaccine " << vax << endl;
             Appointment* ret = new Appointment{cf,
-                 this->vax_[vax]->get_vax().code,
-                 this->vax_[vax]->get_vax().name,
-                 data, 
-                 time, 
-                 this->vax_[vax]->get_vax().injections,
-                 false};
+                this->vax_[vax]->get_vax().code,
+                this->vax_[vax]->get_vax().name,
+                data, 
+                time, 
+                this->vax_[vax]->get_vax().injections,
+                false
+            };
             this->app_[cf] = ret;
             this->pazienti_[cf]->set_vaccino(vax);
             return *ret;
@@ -211,7 +212,7 @@ class Center{
             this->on_off = true;
             this->data_ = data;
             this->tempo_ = time;
-            cout << "**** Opening at " << data_ << ", " << tempo_ << " ****" << endl;
+            cout << endl << "**** Opening at " << data_ << ", " << tempo_ << " ****\n" << endl;
         }
 
         void close(){
@@ -220,32 +221,42 @@ class Center{
         }
 
         void enqueue(Appointment app){
-            cout << "enqueing " << app << " at checkin " << app.vaccine_code << endl;
-            Pazienti* paz = this->pazienti_[app.fiscal_code];
-            int siz = this->check_[0]->get_size();
-            int i = 0;
-            int min = 0;
-            for(Checkin* v : this->check_){
-                if(v->get_size() <= siz){
-                    siz = v->get_size();
-                    min = i;
+            if(this->on_off == true){
+                cout << "enqueing " << app << " at checkin " << app.vaccine_code << endl;
+                Pazienti* paz = this->pazienti_[app.fiscal_code];
+                int siz = this->check_[0]->get_size();
+                int i = 0;
+                int min = 0;
+                for(Checkin* v : this->check_){
+                    if(v->get_size() <= siz){
+                        siz = v->get_size();
+                        min = i;
+                    }
+                    i++;
                 }
-                i++;
+                this->check_[min]->push_back(paz);
+            } else {
+                throw std::invalid_argument("Il centro vaccinale è chiuso");
             }
-            this->check_[min]->push_back(paz);
         }
 
         vector<string> dequeue(){
             
             vector<string> ret;
 
-            cout << "dequeuing injections" << endl;
+            cout << "\ndequeuing injections" << endl;
             for(Injection_points* in : this->inj_){
                 if(in->get_size() == 0) continue;
                 Pazienti* ex_paz = in->get_deque().front();
-                in->pop_front();
-                ret.push_back(ex_paz->get_nome());
-                cout << "Injected " << ex_paz->get_cf() << " with " << ex_paz->get_vax().first << endl;
+                if(this->pazienti_[ex_paz->get_cf()]->get_vax().second <= this->vax_.at(in->get_vax().name)->get_vax().injections){                    
+                    in->pop_front();
+                    ret.push_back(ex_paz->get_nome());
+                    this->pazienti_[ex_paz->get_cf()]->set_n_iniezione();
+                    cout << "Injected " << ex_paz->get_cf() << " with " << ex_paz->get_vax().first;
+                    cout << " n° di iniezione: " << this->pazienti_[ex_paz->get_cf()]->get_vax().second << endl;
+                } else {
+                    throw std::invalid_argument("Ciclo vaccinale completo");
+                }
             }
 
             cout << "dequeuing checkin" << endl;
@@ -294,6 +305,5 @@ inline ostream& operator<<(ostream& os, const Center& center){
     }
     return os;
 }
-
 
 #endif // CENTER_H
