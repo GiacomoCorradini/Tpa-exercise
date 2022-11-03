@@ -1,2 +1,2 @@
 # Programmazione orientata agli oggetti
-In questa repository sono presenti i programmi di esercitazione del corso di tecniche di programmazione avanzata
+In questa repository sono presenti le esercitazioni del corso "tecniche di programmazione avanzata"
